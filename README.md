@@ -26,5 +26,23 @@ Then, to detect transcription readthrough (TRT) directly from the bam files gene
 ARTDeco -home-dir ARTDECO_DIR -bam-files-dir BAM_FILES_DIR -gtf-file GTF_FILE -cpu NUM_CPU -chrom-sizes-file CHROM_SIZES_FILE
 ```
 
-ARTDeco returns a variety of metrics to measure readthrough. For the purpose of this work, the information of interest are contained inside the “quantification” and “dogs” folders (expression levels and novel transcripts created as a result of readthrough, respectively).
+ARTDeco returns a variety of metrics to measure readthrough. For the purpose of this work, the information of interest is contained inside the “quantification” and “dogs” folders (expression levels and novel transcripts created as a result of readthrough, respectively).
 
+### Filter ARTDeco output for non-Stranded RNA-seq samples
+
+GTEx samples were profiled using non-stranded RNAseq libraries. Since transcriptional signals can come from either direction, ARTDeco is ambiguous when inferring a true downstream transcript in some cases. Thus, a significant number of reads identified as downstream transcripts were in reality reads coming from genes being expressed in the opposite direction. To eliminate these false positives created by the lack of strandedness, we filtered the output from ARTDeco to report only entries that have no overlap with genes in the opposite strand using the intersect function from bedtools (v2.30.0) (Quinlan and Hall, 2010). 
+
+for each file .bed file inside the dog folder, we run bedtools as: 
+
+```
+bedtools intersect -a filename.bed -b genes_condensed.bed -v -S > filename.filtered.intersect
+```
+
+This approach discards RT transcripts with close downstream neighbors in the opposite strand but ensures that our list of readthrough genes is robust. 
+To optimize this step, we created a script (´run-bedtools-intersect.sh´) that automatically runs this bedtool command to all files inside the ´dogs´ folder (artdeco output) and creates a new folder containing all the new filtered dog files (´dogs-filtered´). 
+
+```
+./filter-artdeco-output/run-bedtools-intersect.sh artdeco_output_folder ./filter-artdeco-output/dogs.filter.antisense.genes.py
+```
+
+The scripts takes two files as input: (1) standard artdeco output containing all subfolders; (2) custom python script (available inside the same folder) that filters all the remaining .txt files according to the genes filtered in the new dog-filtered bed file. A new folder is created containing these new files.
