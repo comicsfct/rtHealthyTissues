@@ -30,7 +30,7 @@ ARTDeco returns a variety of metrics to measure readthrough.
 For the purpose of this work, the information of interest is contained inside the “quantification” and “dogs” folders
 (expression levels and novel transcripts created as a result of readthrough, respectively).
 
-### Filter ARTDeco output for Non-Stranded RNA-seq Samples
+### Filter ARTDeco output for non-stranded RNA-seq samples
 
 GTEx samples were profiled using non-stranded RNAseq libraries. Since transcriptional signals can come from either direction, ARTDeco is ambiguous when inferring a true downstream transcript in some cases. Thus, a significant number of reads identified as downstream transcripts were in reality reads coming from genes being expressed in the opposite direction. To eliminate these false positives created by the lack of strandedness, we filtered the output from ARTDeco to report only entries that have no overlap with genes in the opposite strand using the intersect function from bedtools (v2.30.0) (Quinlan and Hall, 2010). 
 
@@ -52,7 +52,7 @@ The scripts takes two files as input: (1) standard artdeco output containing all
 (2) custom python script (available inside the same folder) that filters all the remaining .txt files according to the genes filtered in the new dog-filtered bed file. 
 A new folder is created containing these new files.
 
-### Create a Master Table Contaiing All Data for Downstream Analysis
+### Create a Master Table containing all data for downstream analysis
 
 We created a script that takes as input a folder containing one or multiple ARTDeco output folders (one for each tissue in this scenario) 
 and uses the two subfolders ("quantification" and "dogs") to combine expression levels from genes and readthrough regions into a simple dataframe 
@@ -65,3 +65,6 @@ that can be used for all the downstream analysis.
 this creates a table `master.table.GTEx.samples.RT.analysis` with most of the information used for downstream analyis.
 Here, expressed genes were defined as genes with FPKM > 1 in at least 25% of the samples of a given tissue. 
 Only RT transcripts coming from expressed genes in each given tissue were considered for downstream analysis.
+
+Code to plot most of the figures can be found in the script `plotting_readthrough_quantification`
+### Create a Master Table Containing All Data for Downstream Analysis
