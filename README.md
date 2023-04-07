@@ -66,5 +66,4 @@ this creates a table `master.table.GTEx.samples.RT.analysis` with most of the in
 Here, expressed genes were defined as genes with FPKM > 1 in at least 25% of the samples of a given tissue. 
 Only RT transcripts coming from expressed genes in each given tissue were considered for downstream analysis.
 
-Code to plot most of the figures can be found in the script `plotting_readthrough_quantification`
-### Create a Master Table Containing All Data for Downstream Analysis
+Code to plot some of the figures in the manuscript can be found in the script `plotting_readthrough_quantification`
