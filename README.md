@@ -45,7 +45,7 @@ To optimize this step, we created a script (`run-bedtools-intersect.sh`) that au
 folder (artdeco output) and creates a new folder containing all the new filtered dog files (`dogs-filtered`). 
 
 ```
-./filter-artdeco-output/run-bedtools-intersect.sh artdeco_output_folder ./filter-artdeco-output/dogs.filter.antisense.genes.py
+./filter-artdeco-output/run-bedtools-intersect.sh artdeco_output_folder ./filter-artdeco-output/dogs.filter.dubious.genes.py
 ```
 
 The scripts takes two files as input: (1) standard artdeco output containing all subfolders; 
