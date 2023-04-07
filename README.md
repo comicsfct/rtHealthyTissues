@@ -34,7 +34,7 @@ For the purpose of this work, the information of interest is contained inside th
 
 GTEx samples were profiled using non-stranded RNAseq libraries. Since transcriptional signals can come from either direction, ARTDeco is ambiguous when inferring a true downstream transcript in some cases. Thus, a significant number of reads identified as downstream transcripts were in reality reads coming from genes being expressed in the opposite direction. To eliminate these false positives created by the lack of strandedness, we filtered the output from ARTDeco to report only entries that have no overlap with genes in the opposite strand using the intersect function from bedtools (v2.30.0) (Quinlan and Hall, 2010). 
 
-for each file .bed file inside the dog folder, we run bedtools as: 
+for each .bed file inside the dog folder, we run bedtools as: 
 
 ```
 bedtools intersect -a filename.bed -b genes_condensed.bed -v -S > filename.filtered.intersect
