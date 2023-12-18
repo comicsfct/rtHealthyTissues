@@ -1,2 +1,2 @@
-# example of ARTDeco out folders for different human tissue (each folder contains multiple samples)
-https://unlpt-my.sharepoint.com/:f:/g/personal/p_caldas_fct_unl_pt/Etzj6KTvk5BCjmh5vtG6JIMBgBsSzEbvdUWtJXuBC7ncng?e=gEyIlI
+# ARTDeco output folders for different human tissues - each folder contains several samples
+https://doi.org/10.6084/m9.figshare.24848265.v1
