@@ -119,14 +119,14 @@ def MatchingSubSample(df_A, df_B, conf):
 # select tissues of interest (strings that exist within filename in the folder)
 
 chromatin_counts_folder = 'epigenetics/chromatin_marks_counts_imputed/'
-tissues = ['muscle'] # 'colon_sigmoid'] #, 'esophagus', 'lung', 'thymus']
+tissues = ['psoas', 'colon_sigmoid', 'esophagus', 'lung', 'thymus']
 
 # select folder containing expressed genes per tissue (to create expression-matched subsamples of genes)
 expgenes_folder = 'epigenetics/expgenes_beds/'
 
 # create two expression-matched subsamples of genes for RT and NRT with same size
 size = 250    # size of each subsample
-perm = 10     # number of permutations per tissue
+perm = 1000     # number of permutations per tissue
 
 perm_chromatin_marks_count = []
 
@@ -169,7 +169,8 @@ for tissue in tissues: # for each tissue in the list of interest
 
                 for file in os.listdir(chromatin_counts_folder):
                     
-                   
+                    if tissue == 'psoas': tissue = 'muscle'
+                    
                     if tissue in file:
 
                         epigenome = file.split('-')[0]
@@ -197,7 +198,8 @@ for tissue in tissues: # for each tissue in the list of interest
 
                         except:
                             mark_count = 0
-
+                        
+                        
                         chromatin_marks_count.append([tissue, epigenome, chrom_mark,region, rt, mark_count])
 
                 chromatin_marks_count = pd.DataFrame(chromatin_marks_count, columns=['tissue','epi','mark','region','type','gene_hits'])
@@ -207,8 +209,10 @@ for tissue in tissues: # for each tissue in the list of interest
 all_perm_combined = pd.DataFrame([])
 
 # for tissue in tissues:
+
 for tissue in tissues:
     
+    if tissue == 'psoas': tissue = 'muscle'    
     perm_gene_hits = pd.DataFrame([]) # table to save all gene_hits from each permutation
     tissue_table_comb = pd.DataFrame([]) # table to save all genes_hits combined into a single df
 
@@ -218,7 +222,7 @@ for tissue in tissues:
         if table['tissue'].str.contains(tissue).iloc[0] == True:
 
             # combine all gene_hits arrays into a single one
-            perm_gene_hits = pd.concat([perm_gene_hits, table['gene_hits']], axis = 1)
+            perm_gene_hits = pd.concat([perm_gene_hits, table['gene_hits']], axis = 1, ignore_index= True)
 
             # combine all columns into one
             perm_gene_hits_comb = perm_gene_hits.agg(np.array, axis=1)
@@ -250,6 +254,11 @@ region = 'TTSplus'
 
 main_table = all_perm_combined
 
+# save source data for the reviewers
+source_data_folder = 'source_data/'
+main_table.to_csv(source_data_folder + 'source.data.Fig3b-c.csv', index = False)
+
+# filter data for plotting
 data = main_table[(main_table['region'] == region) & (main_table['tissue']==tissue)]
 # plt.hist(data['gene_hits_perm'].iloc[0])
 
@@ -259,23 +268,18 @@ plt.title('chromatin marks hits {} {}\n'.format(region, tissue), fontsize = 7)
 # order = ['H3K4me1','H3K27ac','H3K36me3', 'H3K9ac', 'H3K4me2', 'DNase']
 data = data.sort_values(['type', 'mark'])
 
-sns.barplot(data = data, x = 'mark', y = 'gene_hits_mean', hue = 'type',
-            palette = ['steelblue', 'crimson'], order = MOI, 
-            edgecolor = 'black', linewidth = 0.8, capsize = 0.1, errwidth = .8,)
+sns.boxplot(data = data.explode('gene_hits_perm').reset_index(drop = True), 
+            x = 'mark', y = 'gene_hits_perm',  hue = 'type', dodge = True,
+            palette = ['steelblue', 'crimson'], order = MOI,  linewidth = 1, fliersize = 0)
 
 #legend
 ax.legend(frameon = False, fontsize = 7)
 
 # format axis
 plt.ylabel('chromatin marks hits (#)', fontsize = 7); plt.xlabel('')
-ax.set_ylim([0, 120]); #ax.set_xlim([-1, data.groupby('tissue').count().shape[0]]);
+ax.set_ylim([0, 180]); #ax.set_xlim([-1, data.groupby('tissue').count().shape[0]]);
 
 # format text labels
 plt.xticks(rotation = 90, fontsize = 6);
 BarplotAxisFormat(ax); plt.tick_params(axis='y', labelsize = 6)
 
-# add error barsw
-x_coords = [p.get_x() + 0.5*p.get_width() for p in ax.patches]
-y_coords = [p.get_height() for p in ax.patches]
-
-ax.errorbar(x_coords, y_coords, yerr = data['gene_hits_std'], fmt="none", capsize=2, c= "k");

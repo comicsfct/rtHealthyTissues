@@ -21,6 +21,7 @@ def BarplotAxisFormat(ax):
 
 # to make tissue names shorter; 
 # to give a specific color to each tissue;
+
 from utils import tissues_abbrev_colors
 tissue_acronyms = tissues_abbrev_colors.tissue_acronyms
 tissue_colors = tissues_abbrev_colors.tissue_colors
@@ -82,6 +83,11 @@ ax.set_xticklabels(labels);
 #             ha = 'center', fontsize = 4, weight = 'bold', rotation = 'vertical')
     
 plt.show()
+
+# save source data for the reviewers
+source_data_folder = 'source_data/'
+data.to_csv(source_data_folder + 'source.data.Fig1c.csv', index = False)
+
  
 # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- #
 # REPRODUCE FIG 1D
@@ -101,8 +107,6 @@ for tissue in master_table['tissue'].unique():
 # find intersection ammong all tissues
 common_dogs = set(common_dogs_list[0]).intersection(*common_dogs_list)
 common_genes = set(common_genes_list[0]).intersection(*common_genes_list)
-
-plt.show()
 
 # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- #
 # REPRODUCE FIG 1D
@@ -154,6 +158,10 @@ ax.set_xticklabels(labels);
 
 plt.show()
 
+# save source data for the reviewers
+source_data_folder = 'source_data/'
+rt_genes_df_genetype_counts.to_csv(source_data_folder + 'source.data.Fig1d.csv', index = False)
+
 
 # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- #
 # REPRODUCE FIG 1E
@@ -194,3 +202,7 @@ labels = pd.Series([label.get_text() for label in ax.get_xticklabels()]).map(tis
 ax.set_xticklabels(labels);ax.set_yticklabels(labels)
 
 plt.show()
+
+# save source data for the reviewers
+source_data_folder = 'source_data/'
+common_genes_pairwise.reset_index().to_csv(source_data_folder + 'source.data.Fig1e.csv', index = False)

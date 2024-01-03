@@ -50,10 +50,12 @@ master_table = pd.read_table('master.table.GTEx.samples.RT.analysis.tab')
 master_table = master_table[(master_table['RT'] == 'RT')|(master_table['RT'] == 'NRT')]
 
 # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- #
-# REPRODUCE FIG 1A
+# REPRODUCE FIG 2A
 # plot expression levels of genebody vs. RT tail
 
 tissue_to_plot = 'muscle-skeletal'
+
+print('Correlation Plot for {}'.format(tissue_to_plot))
 
 fig, ax = plt.subplots(figsize = (3,2), dpi = 150)
 plt.title('RT expression vs gene expression \n', fontsize = 8)
@@ -81,8 +83,66 @@ corr, pval = spearmanr(data['log2dogFPKM'], data['log2geneFPKM'])
 print('corr = {:.3}'.format(corr))
 print('pval = {:.3}'.format(pval))
 
+# save source data for the reviewers
+source_data_folder = 'source_data/'
+data.to_csv(source_data_folder + 'source.data.Fig2a.csv', index = False)
+
 # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- #
-# REPRODUCE FIG 1C
+# REPRODUCE FIG 2B
+# Compute Correlations for all tissues
+
+data = master_table.copy()
+data = data[data['dogFPKM'] > 0]
+data['log2dogFPKM'] = np.log2(data['dogFPKM'])
+data['log2geneFPKM'] = np.log2(data['geneFPKM'])
+
+corr_plot = []
+
+for tissue in data['tissue'].unique():
+    
+    tissue_data = data[data['tissue'] == tissue]
+    
+    corr, pval = spearmanr(tissue_data['log2dogFPKM'], tissue_data['log2geneFPKM'])
+
+    corr_plot.append([tissue, corr, pval])
+    
+corr_plot = pd.DataFrame(corr_plot, columns=['tissue','corr','pval'])
+#corr_plot = corr_plot.set_index('tissue')
+corr_plot = corr_plot.iloc[::-1]
+
+fig, ax = plt.subplots(figsize = (2 ,3), dpi = 150)
+
+# prepare data
+corr_values = corr_plot['corr'].values
+pvals = corr_plot['pval'].values
+tissues = corr_plot['tissue'].values
+
+# plot lines and dots (scatter)
+ax.scatter(y = tissues, x = corr_values, marker = 'o', s = 18, edgecolor = 'black', lw = 1, zorder=4, c = 'salmon')
+ax.hlines(y = tissues, xmin = 0, xmax = corr_values, ls = '--', lw = 1, color = 'black', alpha = 0.5, zorder=1)
+
+plt.yticks(fontsize = 6); plt.xticks(fontsize = 7);
+ax.set_xlabel('correlation (spearman)', fontsize = 7)
+ax.tick_params(axis = 'y', width = 1, length = 2)
+ax.set_xlim([0, 1])
+
+# remove spines 
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['left'].set_visible(False)
+
+# replace tissue labels with shorter names
+labels = pd.Series([label.get_text() for label in ax.get_yticklabels()]).map(tissue_acronyms).values
+ax.set_yticklabels(labels);
+
+plt.show()
+
+# save source data for the reviewers
+source_data_folder = 'source_data/'
+corr_plot.to_csv(source_data_folder + 'source.data.Fig2b.csv', index = False)
+
+# ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- #
+# REPRODUCE FIG 2C
 # Plot % of High Expressed Genes RT vs. NRT
 
 rt_high_expgenes_df = master_table[master_table['exp_group'] == 'high'
@@ -115,8 +175,12 @@ BarplotAxisFormat(ax); plt.tick_params(axis = 'y', labelsize = 7)
 labels = pd.Series([label.get_text() for label in ax.get_xticklabels()]).map(tissue_acronyms).values
 ax.set_xticklabels(labels);
 
+# save source data for the reviewers
+source_data_folder = 'source_data/'
+data_stacked.reset_index().to_csv(source_data_folder + 'source.data.Fig2c.csv', index = False)
+
 # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- #
-# REPRODUCE FIG 1D
+# REPRODUCE FIG 2D
 # Plot % of High Expressed Genes RT vs. NRT
 
 master_table_with_length = pd.DataFrame([])
@@ -172,12 +236,16 @@ ax.spines['bottom'].set_position(('axes',-0.02))
 plt.xscale('symlog'); ax.set_xlim([1000, 100000]);
 ax.set_xlabel('Log Length (bp)', fontsize = 7);
 
+# save source data for the reviewers
+source_data_folder = 'source_data/'
+master_table_with_length.to_csv(source_data_folder + 'source.data.Fig2d.csv', index = False)
+
 # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- #
-# REPRODUCE FIG 1E
+# REPRODUCE FIG 2E
 # Heatmap representing the enrichment (red) or depletion (blue) of RT gene proportions across different chromosomes for each tissue.
 
 # import all gene coordiantes
-all_genes_bed = pd.read_table('utils/human.gencode.v37.genes.bed', header= None)
+all_genes_bed = pd.read_table('utils/human.gencode.v37.genes.bed', header=None)
 all_genes_bed.columns = ['chrm','start','end','gene_id','gene_name','strand','gene_type']
 
 # combine with master table
@@ -282,7 +350,7 @@ ax.spines['left'].set_position(('axes',-0.03))
 
 
 # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- #
-# REPRODUCE FIG 1F
+# REPRODUCE FIG 2F
 # Scatterplot RT transcripts percentage in all tissues and density of expressed genes for each chromosome
 
 # compute number of expgenes per chrmosome in each tissue
@@ -318,13 +386,12 @@ sns.scatterplot(data = chrm_density,  y = 'RT%', x = 'dens', color = 'darkcyan',
 
 BarplotAxisFormat(ax)
 plt.yticks(fontsize = 8); plt.xticks(fontsize = 8);
+plt.ylim([0,30]); plt.xlim([0,60])
 plt.ylabel('RT genes (%)', fontsize = 8); plt.xlabel('Gene Density (#genes/chrm length in Mb)', fontsize = 8);
 
 # add some labels
 for i, chrm in chrm_density.iterrows():
-    
     if chrm['chrm'] in ['chr16','chr17','chr19','chr4','chrY', 'chr13',]:
-        
         ax.text(chrm['dens']-2.5, chrm['RT%']+2, chrm['chrm'], fontsize = 7, alpha = 0.8)
     
 # statistics
