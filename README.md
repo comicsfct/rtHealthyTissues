@@ -1,5 +1,7 @@
 # rtHealthyTissues
-readthrough in healthy tissues
+Repository dedicated to the code and data associated with the manuscript titled:
+Transcription readthrough is prevalent in healthy human tissues and associated with inherent genomic features 
+https://www.nature.com/articles/s42003-024-05779-5
 
 # readthrough in healthy tissues
 framework to quantify transcription readthrough in human samples from the GTEx project
